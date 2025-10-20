@@ -1,0 +1,12 @@
+{
+  "name": "filipino-dama-app",
+  "version": "1.0.0",
+  "description": "Filipino Dama Game as a Desktop App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^26.2.0"
+  }
+}

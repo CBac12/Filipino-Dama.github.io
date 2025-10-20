@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filipino Dama</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #FFD700;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #FFEAA7;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .player-label {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .player1 .player-label {
+            color: #FF6B6B;
+        }
+
+        .player2 .player-label {
+            color: #FFD700;
+        }
+
+        .player-pieces {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .piece-indicator {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+        }
+
+        .player1 .piece-indicator {
+            background: radial-gradient(circle at 30% 30%, #ff7b7b, #ff0000);
+            border: 2px solid #ff0000;
+        }
+
+        .player2 .piece-indicator {
+            background: radial-gradient(circle at 30% 30%, #FFD700, #B8860B);
+            border: 2px solid #B8860B;
+        }
+
+        .player1 .piece-indicator.dama {
+            border: 3px solid gold;
+            box-shadow: 0 0 8px gold;
+        }
+
+        .player2 .piece-indicator.dama {
+            border: 3px solid gold;
+            box-shadow: 0 0 8px gold;
+        }
+
+        .current-player {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.5s ease;
+        }
+
+        .player1-turn {
+            background-color: rgba(255, 107, 107, 0.3);
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+
+        .player2-turn {
+            background-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .board-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .game-board {
+            display: inline-block;
+            border: 15px solid #5D4037;
+            border-radius: 5px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+            background-color: #DEB887;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .board-row {
+            display: flex;
+        }
+
+        .board-cell {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .light {
+            background-color: #DEB887;
+        }
+
+        .dark {
+            background-color: #DEB887;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark::before, .dark::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 2px;
+            background-color: rgba(0, 0, 0, 0.3);
+            top: 50%;
+            left: -50%;
+        }
+
+        .dark::before {
+            transform: rotate(45deg);
+        }
+
+        .dark::after {
+            transform: rotate(-45deg);
+        }
+
+        .coordinate-label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #8B4513;
+            z-index: 1;
+        }
+
+        .coordinate-top {
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .coordinate-bottom {
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .coordinate-left {
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .coordinate-right {
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .piece {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 10px;
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .piece:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .piece.selected {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px yellow, 0 6px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .player1-piece {
+            background: radial-gradient(circle at 30% 30%, #ff7b7b, #ff0000, #8B0000);
+            border: 2px solid #8B0000;
+        }
+
+        .player2-piece {
+            background: radial-gradient(circle at 30% 30%, #FFD700, #B8860B, #8B6914);
+            border: 2px solid #8B6914;
+        }
+
+        .dama {
+            border: 3px solid gold;
+            box-shadow: 0 0 10px gold;
+        }
+
+        .dama::after {
+            content: "★";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: gold;
+            font-size: 24px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #resetBtn {
+            background-color: #f44336;
+        }
+
+        #resetBtn:hover {
+            background-color: #d32f2f;
+        }
+
+        #backBtn {
+            background-color: #2196F3;
+        }
+
+        #backBtn:hover {
+            background-color: #1976D2;
+        }
+
+        .capture-indicator {
+            color: #ff5252;
+            font-weight: bold;
+        }
+
+        .dama-info {
+            color: #FFD700;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .game-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            display: none;
+        }
+
+        /* Animation classes */
+        .moving {
+            animation: movePiece 0.5s ease-in-out forwards;
+            z-index: 10;
+        }
+
+        .capturing {
+            animation: capturePiece 0.5s ease-out forwards;
+            z-index: 10;
+        }
+
+        .becoming-dama {
+            animation: crownPiece 0.8s ease-out forwards;
+        }
+
+        @keyframes movePiece {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes capturePiece {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(10deg);
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes crownPiece {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            }
+            50% {
+                transform: scale(1.3);
+                box-shadow: 0 0 15px gold, 0 0 25px rgba(255, 215, 0, 0.7);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 10px gold;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .board-cell {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .piece {
+                width: 38px;
+                height: 38px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .dama::after {
+                font-size: 18px;
+            }
+            
+            .coordinate-label {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .board-cell {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .piece {
+                width: 30px;
+                height: 30px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .dama::after {
+                font-size: 14px;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .coordinate-label {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Filipino Dama</h1>
+            <p class="tagline">Traditional Filipino Checkers Game</p>
+        </header>
+
+        <div class="game-info">
+            <div class="player-info player1">
+                <div class="player-label">Player 1</div>
+                <div class="player-pieces" id="player1Pieces">
+                    <!-- Player 1 pieces will be generated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="player-info player2">
+                <div class="player-label">Player 2</div>
+                <div class="player-pieces" id="player2Pieces">
+                    <!-- Player 2 pieces will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="current-player player1-turn" id="currentPlayer">Player 1's Turn</div>
+
+        <div class="board-container">
+            <div class="game-board" id="gameBoard">
+                <!-- Board will be generated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="backBtn">Return to Home</button>
+            <button id="resetBtn">Restart</button>
+        </div>
+    </div>
+
+    <div class="game-message" id="gameMessage"></div>
+
+   <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const gameBoard = document.getElementById('gameBoard');
+    const currentPlayerDisplay = document.getElementById('currentPlayer');
+    const backBtn = document.getElementById('backBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const player1PiecesDisplay = document.getElementById('player1Pieces');
+    const player2PiecesDisplay = document.getElementById('player2Pieces');
+    const gameMessage = document.getElementById('gameMessage');
+
+    backBtn.addEventListener('click', () => {
+        window.location.href = 'home.html';
+    });
+
+    let board = [];
+    let currentPlayer = 1;
+    let selectedPiece = null;
+    let validMoves = [];
+    let gameOver = false;
+    let mustCapture = false;
+    let animationInProgress = false;
+
+    function initGame() {
+        board = Array(8).fill().map(() => Array(8).fill(null));
+
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                if ((row + col) % 2 === 1) {
+                    if (row < 3) {
+                        board[row][col] = { player: 2, isDama: false };
+                    } else if (row > 4) {
+                        board[row][col] = { player: 1, isDama: false };
+                    }
+                }
+            }
+        }
+
+        currentPlayer = 1;
+        selectedPiece = null;
+        validMoves = [];
+        gameOver = false;
+        mustCapture = false;
+        animationInProgress = false;
+
+        renderBoard();
+        updateGameInfo();
+        updatePlayerPiecesDisplay();
+        showMessage("FILIPINO DAMA");
+    }
+
+    function renderBoard() {
+        gameBoard.innerHTML = '';
+
+        for (let row = 0; row < 8; row++) {
+            const boardRow = document.createElement('div');
+            boardRow.className = 'board-row';
+
+            for (let col = 0; col < 8; col++) {
+                const cell = document.createElement('div');
+                cell.className = `board-cell ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+
+                // Add coordinate labels
+                if (row === 0) {
+                    const topLabel = document.createElement('div');
+                    topLabel.className = 'coordinate-label coordinate-top';
+                    topLabel.textContent = String.fromCharCode(65 + col); // A-H
+                    cell.appendChild(topLabel);
+                }
+                
+                if (row === 7) {
+                    const bottomLabel = document.createElement('div');
+                    bottomLabel.className = 'coordinate-label coordinate-bottom';
+                    bottomLabel.textContent = String.fromCharCode(65 + col); // A-H
+                    cell.appendChild(bottomLabel);
+                }
+                
+                if (col === 0) {
+                    const leftLabel = document.createElement('div');
+                    leftLabel.className = 'coordinate-label coordinate-left';
+                    leftLabel.textContent = (8 - row).toString(); // 1-8
+                    cell.appendChild(leftLabel);
+                }
+                
+                if (col === 7) {
+                    const rightLabel = document.createElement('div');
+                    rightLabel.className = 'coordinate-label coordinate-right';
+                    rightLabel.textContent = (8 - row).toString(); // 1-8
+                    cell.appendChild(rightLabel);
+                }
+
+                cell.addEventListener('click', () => handleCellClick(row, col));
+
+                const piece = board[row][col];
+                if (piece) {
+                    const pieceElement = document.createElement('div');
+                    pieceElement.className = `piece player${piece.player}-piece ${piece.isDama ? 'dama' : ''}`;
+                    pieceElement.dataset.player = piece.player;
+
+                    pieceElement.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handlePieceClick(row, col);
+                    });
+
+                    cell.appendChild(pieceElement);
+                }
+
+                boardRow.appendChild(cell);
+            }
+
+            gameBoard.appendChild(boardRow);
+        }
+    }
+
+    function handlePieceClick(row, col) {
+        if (gameOver || animationInProgress) return;
+        const piece = board[row][col];
+        if (!piece || piece.player !== currentPlayer) return;
+
+        selectedPiece = { row, col };
+        calculateValidMoves(row, col);
+        renderBoard();
+    }
+
+    function handleCellClick(row, col) {
+        if (gameOver || !selectedPiece || animationInProgress) return;
+        const move = validMoves.find(m => m.row === row && m.col === col);
+        if (!move) return;
+        animationInProgress = true;
+        animateMovePiece(selectedPiece.row, selectedPiece.col, row, col, move);
+    }
+
+    function animateMovePiece(fromRow, fromCol, toRow, toCol, move) {
+        const fromCell = document.querySelector(`.board-cell[data-row="${fromRow}"][data-col="${fromCol}"]`);
+        const pieceElement = fromCell.querySelector('.piece');
+
+        pieceElement.classList.add('moving');
+
+        if (move.isCapture) {
+            const captured = document.querySelector(`.board-cell[data-row="${move.captureRow}"][data-col="${move.captureCol}"] .piece`);
+            if (captured) captured.classList.add('capturing');
+        }
+
+        setTimeout(() => {
+            movePiece(fromRow, fromCol, toRow, toCol, move);
+            const piece = board[toRow][toCol];
+
+            if (!piece.isDama && shouldBecomeDama(toRow, piece.player)) {
+                board[toRow][toCol].isDama = true;
+                renderBoard();
+                animateCrownPiece(toRow, toCol);
+            } else {
+                finishMove(toRow, toCol, move);
+            }
+        }, 500);
+    }
+
+    function shouldBecomeDama(row, player) {
+        return (player === 1 && row === 0) || (player === 2 && row === 7);
+    }
+
+    function animateCrownPiece(row, col) {
+        const cell = document.querySelector(`.board-cell[data-row="${row}"][data-col="${col}"]`);
+        const pieceElement = cell.querySelector('.piece');
+        if (!pieceElement) return;
+
+        pieceElement.classList.add('becoming-dama');
+
+        setTimeout(() => {
+            pieceElement.classList.remove('becoming-dama');
+            pieceElement.classList.add('dama');
+            showMessage("DAMA CREATED!");
+            finishMove(row, col);
+        }, 800);
+    }
+
+    function finishMove(row, col, move = null) {
+        selectedPiece = null;
+        validMoves = [];
+
+        if (checkGameOver()) {
+            gameOver = true;
+            const winner = currentPlayer === 1 ? "Player 1" : "Player 2";
+            showMessage(`${winner} WINS!`);
+            currentPlayerDisplay.textContent = `Game Over! ${winner} Wins!`;
+            currentPlayerDisplay.className = 'current-player capture-indicator';
+            animationInProgress = false;
+            renderBoard();
+            return;
+        }
+
+        if (move && move.isCapture) {
+            calculateValidMoves(row, col);
+            const anotherCapture = validMoves.some(m => m.isCapture);
+            if (anotherCapture) {
+                selectedPiece = { row, col };
+                mustCapture = true;
+                animationInProgress = false;
+                renderBoard();
+                return;
+            }
+        }
+
+        currentPlayer = currentPlayer === 1 ? 2 : 1;
+        mustCapture = false;
+        updateGameInfo();
+        updatePlayerPiecesDisplay();
+        renderBoard();
+        animationInProgress = false;
+    }
+
+    function movePiece(fromRow, fromCol, toRow, toCol, move) {
+        const piece = board[fromRow][fromCol];
+        board[toRow][toCol] = { ...piece };
+        board[fromRow][fromCol] = null;
+        if (move && move.isCapture) {
+            board[move.captureRow][move.captureCol] = null;
+        }
+    }
+function calculateValidMoves(row, col) {
+    validMoves = [];
+    const piece = board[row][col];
+    if (!piece) return;
+
+    const directions = [[-1,-1],[-1,1],[1,-1],[1,1]];
+
+    if (piece.isDama) {
+        // Dama can move freely diagonally and capture anywhere
+        for (const [dr, dc] of directions) {
+            let r = row + dr;
+            let c = col + dc;
+            let captured = false;
+
+            while (isValid(r, c)) {
+                if (!board[r][c]) {
+                    // empty cell
+                    if (!captured) {
+                        validMoves.push({ row: r, col: c, isCapture: false });
+                    } else {
+                        validMoves.push({
+                            row: r,
+                            col: c,
+                            isCapture: true,
+                            captureRow: captured.row,
+                            captureCol: captured.col
+                        });
+                    }
+                } else {
+                    if (board[r][c].player === piece.player) break; // blocked by own piece
+                    if (captured) break; // can't capture more than one piece in one move
+                    captured = { row: r, col: c };
+                }
+                r += dr;
+                c += dc;
+            }
+        }
+    } else {
+        // Normal pieces (not yet Dama)
+        const normalDirs = piece.player === 1 ? [[-1, -1], [-1, 1]] : [[1, -1], [1, 1]];
+
+        for (const [dr, dc] of normalDirs) {
+            const nr = row + dr, nc = col + dc;
+            if (isValid(nr, nc) && !board[nr][nc]) {
+                validMoves.push({ row: nr, col: nc, isCapture: false });
+            }
+
+            const jr = row + dr, jc = col + dc, lr = row + 2 * dr, lc = col + 2 * dc;
+            if (
+                isValid(lr, lc) &&
+                board[jr]?.[jc] &&
+                board[jr][jc].player !== piece.player &&
+                !board[lr][lc]
+            ) {
+                validMoves.push({
+                    row: lr,
+                    col: lc,
+                    isCapture: true,
+                    captureRow: jr,
+                    captureCol: jc
+                });
+            }
+        }
+    }
+}
+
+    function isValid(r, c) {
+        return r >= 0 && r < 8 && c >= 0 && c < 8;
+    }
+
+    function checkGameOver() {
+        let p1 = 0, p2 = 0;
+        for (let row of board) {
+            for (let cell of row) {
+                if (cell) cell.player === 1 ? p1++ : p2++;
+            }
+        }
+        return p1 === 0 || p2 === 0;
+    }
+
+    function updateGameInfo() {
+        const name = currentPlayer === 1 ? "Player 1" : "Player 2";
+        currentPlayerDisplay.textContent = `${name}'s Turn`;
+        currentPlayerDisplay.className = `current-player ${currentPlayer === 1 ? 'player1-turn' : 'player2-turn'}`;
+    }
+
+    function updatePlayerPiecesDisplay() {
+        player1PiecesDisplay.innerHTML = '';
+        player2PiecesDisplay.innerHTML = '';
+        let p1 = 0, p2 = 0, d1 = 0, d2 = 0;
+        for (let row of board) {
+            for (let piece of row) {
+                if (piece) {
+                    if (piece.player === 1) { p1++; if (piece.isDama) d1++; }
+                    else { p2++; if (piece.isDama) d2++; }
+                }
+            }
+        }
+        for (let i = 0; i < p1; i++) {
+            const el = document.createElement('div');
+            el.className = `piece-indicator ${i < d1 ? 'dama' : ''}`;
+            player1PiecesDisplay.appendChild(el);
+        }
+        for (let i = 0; i < p2; i++) {
+            const el = document.createElement('div');
+            el.className = `piece-indicator ${i < d2 ? 'dama' : ''}`;
+            player2PiecesDisplay.appendChild(el);
+        }
+    }
+
+    function showMessage(text) {
+        gameMessage.textContent = text;
+        gameMessage.style.display = 'block';
+        setTimeout(() => gameMessage.style.display = 'none', 1500);
+    }
+
+    resetBtn.addEventListener('click', initGame);
+    initGame();
+});
+</script>
+</body>
+</html>

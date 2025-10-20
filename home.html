@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filipino Dama - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            color: #FFD700;
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #FFEAA7;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #FFD700;
+            font-style: italic;
+        }
+
+        .game-board-preview {
+            display: inline-block;
+            margin: 30px 0;
+            border: 10px solid #5D4037;
+            border-radius: 5px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+            background-color: #DEB887;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-row {
+            display: flex;
+        }
+
+        .preview-cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .preview-light {
+            background-color: #DEB887;
+        }
+
+        .preview-dark {
+            background-color: #DEB887;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-dark::before, .preview-dark::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 2px;
+            background-color: rgba(0, 0, 0, 0.3);
+            top: 50%;
+            left: -50%;
+        }
+
+        .preview-dark::before {
+            transform: rotate(45deg);
+        }
+
+        .preview-dark::after {
+            transform: rotate(-45deg);
+        }
+
+        .preview-piece {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .preview-player1 {
+            background: radial-gradient(circle at 30% 30%, #ff7b7b, #ff0000, #8B0000);
+            border: 2px solid #8B0000;
+        }
+
+        .preview-player2 {
+            background: radial-gradient(circle at 30% 30%, #FFD700, #B8860B, #8B6914);
+            border: 2px solid #8B6914;
+        }
+
+        .preview-dama {
+            border: 3px solid gold;
+            box-shadow: 0 0 10px gold;
+        }
+
+        .preview-dama::after {
+            content: "★";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: gold;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .home-button {
+            padding: 18px 30px;
+            font-size: 1.4rem;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .home-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .home-button:hover::before {
+            left: 100%;
+        }
+
+        .home-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .home-button:active {
+            transform: translateY(2px);
+        }
+
+        #playBtn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        #guideBtn {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+
+        #quitBtn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+
+        .game-features {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .feature {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        /* QR Code Section */
+        .qr-section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .qr-section h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        #qrCode {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 200px;
+            max-height: 200px;
+            width: 180px;
+            height: 180px;
+        }
+
+        .qr-instructions {
+            font-size: 0.9rem;
+            color: #FFEAA7;
+            max-width: 300px;
+            line-height: 1.4;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #FFEAA7;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 650px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            .tagline {
+                font-size: 1.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .preview-cell {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .preview-piece {
+                width: 22px;
+                height: 22px;
+            }
+            
+            .preview-dama::after {
+                font-size: 10px;
+            }
+            
+            .home-button {
+                padding: 15px 25px;
+                font-size: 1.2rem;
+            }
+            
+            .qr-section h3 {
+                font-size: 1.3rem;
+            }
+            
+            #qrCode {
+                max-width: 180px;
+                max-height: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+            
+            .game-features {
+                flex-direction: column;
+            }
+            
+            .preview-cell {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .preview-piece {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .preview-dama::after {
+                font-size: 8px;
+            }
+            
+            .qr-section h3 {
+                font-size: 1.2rem;
+            }
+            
+            #qrCode {
+                max-width: 150px;
+                max-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FILIPINO DAMA</h1>
+            <p class="tagline">Traditional Filipino Checkers Game</p>
+            <p class="subtitle">Experience the classic strategy game of the Philippines</p>
+        </header>
+
+        <div class="game-board-preview">
+            <!-- Board preview rows -->
+            <div class="preview-row">
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+            </div>
+            <div class="preview-row">
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light">
+                    <div class="preview-piece preview-player2"></div>
+                </div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+            </div>
+            <div class="preview-row">
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+            </div>
+            <div class="preview-row">
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+            </div>
+            <div class="preview-row">
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+            </div>
+            <div class="preview-row">
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light">
+                    <div class="preview-piece preview-player1"></div>
+                </div>
+            </div>
+            <div class="preview-row">
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+            </div>
+            <div class="preview-row">
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light">
+                    <div class="preview-piece preview-player1 preview-dama"></div>
+                </div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+                <div class="preview-cell preview-dark"></div>
+                <div class="preview-cell preview-light"></div>
+            </div>
+        </div>
+
+        <div class="buttons-container">
+            <button class="home-button" id="playBtn">PLAY GAME</button>
+            <button class="home-button" id="guideBtn">HOW TO PLAY</button>
+            <button class="home-button" id="quitBtn">QUIT</button>
+        </div>
+
+        <!-- QR Code Section -->
+        <div class="qr-section">
+            <h3>Share Filipino Dama</h3>
+            <div class="qr-container">
+                <div id="qrCode"></div>
+                <p class="qr-instructions">Scan this QR code with your phone to access Filipino Dama on any device!</p>
+            </div>
+        </div>
+
+        <div class="game-features">
+            <div class="feature">
+                <h3>Traditional Rules</h3>
+                <p>Play with authentic Filipino Dama rules and mechanics</p>
+            </div>
+            <div class="feature">
+                <h3>Dama Pieces</h3>
+                <p>Crown your pieces to move in any diagonal direction</p>
+            </div>
+            <div class="feature">
+                <h3>Strategy Game</h3>
+                <p>Outsmart your opponent with tactical moves</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 Filipino Dama - A Traditional Filipino Game</p>
+        </footer>
+    </div>
+
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const playBtn = document.getElementById('playBtn');
+            const guideBtn = document.getElementById('guideBtn');
+            const quitBtn = document.getElementById('quitBtn');
+
+            playBtn.addEventListener('click', () => {
+                window.location.href = 'game.html';
+            });
+
+            guideBtn.addEventListener('click', () => {
+                window.location.href = 'instructions.html';
+            });
+
+            quitBtn.addEventListener('click', () => {
+                if (confirm("Are you sure you want to quit Filipino Dama?")) {
+                    window.close();
+                    if (!window.closed) {
+                        alert("Thank you for playing Filipino Dama! You can close this tab now.");
+                    }
+                }
+            });
+
+            const buttons = document.querySelectorAll('.home-button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    button.style.transform = 'translateY(-5px) scale(1.05)';
+                });
+                button.addEventListener('mouseleave', () => {
+                    button.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Generate QR Code
+            function generateQRCode() {
+                // Get the current page URL
+                const currentUrl = window.location.href;
+                
+                // Create QR code
+                const qrCode = new QRCode(document.getElementById('qrCode'), {
+                    text: currentUrl,
+                    width: 150,
+                    height: 150,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+            
+            generateQRCode();
+        });
+    </script>
+</body>
+</html>
